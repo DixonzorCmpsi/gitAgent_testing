@@ -1,0 +1,27 @@
+spec_version: "0.1.0"
+name: agent-forge
+version: 0.1.0
+description: >
+  An agent-builder agent that creates, manages, and reuses gitagent-based AI agents
+  on GitHub. Give it a task and it will either find an existing agent or scaffold a new one.
+
+model:
+  preferred: openai/gpt-5.2
+  constraints:
+    temperature: 0.3
+    max_tokens: 8192
+
+skills:
+  - github-agent-create
+  - github-agent-search
+  - gitagent-scaffold
+  - youtube-search
+
+tools:
+  - github-api
+  - gitagent-cli
+  - search-youtube
+
+runtime:
+  max_turns: 30
+  timeout: 300

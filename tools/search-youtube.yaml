@@ -1,0 +1,17 @@
+name: search-youtube
+description: Search YouTube for videos or list a channel's recent uploads using yt-dlp
+input_schema:
+  type: object
+  properties:
+    query:
+      type: string
+      description: Search query or channel handle (e.g., "@zquad", "AI agents tutorial")
+    mode:
+      type: string
+      enum: [search, channel]
+      description: "search = keyword search, channel = list a channel's uploads"
+    max_results:
+      type: integer
+      description: Number of results to return (default 10, max 50)
+  required:
+    - query

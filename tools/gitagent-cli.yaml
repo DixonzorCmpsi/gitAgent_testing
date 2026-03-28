@@ -1,0 +1,13 @@
+name: gitagent-cli
+description: Run gitagent CLI commands — init, validate, export, info, skills management
+input_schema:
+  type: object
+  properties:
+    command:
+      type: string
+      description: The gitagent subcommand (e.g., "init", "validate", "export", "info", "skills")
+    args:
+      type: string
+      description: Arguments and flags for the command
+  required:
+    - command

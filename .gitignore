@@ -1,0 +1,21 @@
+# Environment secrets
+.env
+.env.*
+
+# OpenClaw runtime state
+.openclaw/
+
+# gitagent runtime state
+.gitagent/
+
+# Cloned repos (reference — not part of this agent)
+openclaw/
+gitagent/
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db

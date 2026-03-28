@@ -1,0 +1,131 @@
+%%{init: {'theme': 'dark', 'themeVariables': {'fontSize': '14px'}}}%%
+graph TB
+    subgraph USER["User Layer"]
+        direction LR
+        SC["Desktop shortcut"]
+        BAT["start-forge.bat\nMode selector"]
+        TUI["forge-chat.py\nLightweight TUI"]
+        OCAGENT["openclaw agent\nFull harness mode"]
+        OCGW["openclaw gateway\nWeb UI mode"]
+        SC --> BAT
+        BAT --> TUI
+        BAT --> OCAGENT
+        BAT --> OCGW
+    end
+
+    subgraph RUNTIME["Runtime Layer (OpenRouter)"]
+        direction TB
+        OR["OpenRouter API\nhttps://openrouter.ai/api/v1"]
+        LLM["openai/gpt-5.2\n(LLM brain)"]
+        OR --> LLM
+    end
+
+    subgraph IDENTITY["Agent Identity Layer (gitagent standard)"]
+        direction TB
+        MANIFEST["agent.yaml\nManifest: name, version,\nmodel, skills, tools, runtime"]
+        SOUL["SOUL.md\nPersonality, values,\nexpertise"]
+        RULES["RULES.md\nMust-always / must-never\nboundaries"]
+
+        subgraph SKILLS["Skills"]
+            direction LR
+            S1["github-agent-search"]
+            S2["github-agent-create"]
+            S3["gitagent-scaffold"]
+            S4["youtube-search"]
+        end
+
+        subgraph TOOLS["Declared Tools"]
+            direction LR
+            T1["github-api"]
+            T2["gitagent-cli"]
+            T3["search-youtube"]
+        end
+    end
+
+    subgraph PLUGIN["gitagent Extension (Phase B)"]
+        direction TB
+        LOADER["Agent Loader\nReads agent.yaml + SOUL.md\n+ skills/ + tools/"]
+        PROMPT["Prompt Injector\nhook: before_prompt_build\nInjects compiled identity"]
+        BOUNDARY["Tool Boundary Enforcer\nhook: before_tool_call\nBlocks undeclared tools"]
+        AUDIT["Audit Logger\nhooks: before/after_tool_call\nWrites JSONL per session"]
+        GIT["Git Tracker\nhook: session_end\nAuto-commits audit logs"]
+
+        LOADER --> PROMPT
+        LOADER --> BOUNDARY
+        PROMPT --> AUDIT
+        BOUNDARY --> AUDIT
+        AUDIT --> GIT
+    end
+
+    subgraph OPENCLAW["OpenClaw Fork (Harness)"]
+        direction TB
+        GW["Gateway\nws://127.0.0.1:18789"]
+        HOOKS["Hook System\n26+ lifecycle hooks"]
+        TOOLEXEC["Tool Executor\nbash, browser, web,\nfiles, cron, channels"]
+        WS["Workspace\n~/.openclaw/workspace"]
+        CH["Channels\nWebChat, Telegram,\nDiscord, Slack..."]
+        GW --> HOOKS
+        HOOKS --> TOOLEXEC
+        GW --> WS
+        GW --> CH
+    end
+
+    subgraph AUDITTRAIL["Git Audit Trail"]
+        direction TB
+        JSONL["audit/session-*.jsonl\nTool calls, results,\nblocked actions, timing"]
+        GITLOG["git log audit/\nFull history of\nagent activity"]
+        GITDIFF["git diff\nCompare sessions,\ntrack changes"]
+        JSONL --> GITLOG
+        GITLOG --> GITDIFF
+    end
+
+    subgraph GITHUB["GitHub"]
+        direction TB
+        SEARCH["Search existing repos"]
+        CREATE["Create new repos"]
+        AGENTS["Agent repositories\n(gitagent standard)"]
+        SEARCH --> AGENTS
+        CREATE --> AGENTS
+    end
+
+    subgraph EXPORT["Export Adapters"]
+        direction LR
+        FMT1["system-prompt"]
+        FMT2["claude-code"]
+        FMT3["openclaw"]
+        FMT4["openai"]
+        FMT5["crewai"]
+    end
+
+    %% Data flow
+    TUI -->|"API calls"| OR
+    OCAGENT -->|"via OpenClaw"| OR
+    OCGW -->|"via Gateway"| OR
+
+    LLM -->|"Identity from"| IDENTITY
+    IDENTITY -->|"Loaded by"| PLUGIN
+    PLUGIN -->|"Hooks into"| OPENCLAW
+    OPENCLAW -->|"Tool calls"| GITHUB
+    OPENCLAW -->|"Audit events"| AUDITTRAIL
+
+    IDENTITY --> EXPORT
+    AGENTS -->|"Clone + run"| EXPORT
+
+    %% Styles
+    style USER fill:#1a1a2e,stroke:#00d4aa,color:#fff
+    style RUNTIME fill:#16213e,stroke:#0f3460,color:#fff
+    style IDENTITY fill:#1a1a2e,stroke:#e94560,color:#fff
+    style PLUGIN fill:#1a1a2e,stroke:#ff6b35,color:#fff
+    style OPENCLAW fill:#16213e,stroke:#00d4aa,color:#fff
+    style AUDITTRAIL fill:#1a1a2e,stroke:#ffd700,color:#fff
+    style GITHUB fill:#16213e,stroke:#e94560,color:#fff
+    style EXPORT fill:#16213e,stroke:#533483,color:#fff
+
+    style LOADER fill:#ff6b35,stroke:#fff,color:#fff
+    style PROMPT fill:#ff6b35,stroke:#fff,color:#fff
+    style BOUNDARY fill:#ff6b35,stroke:#fff,color:#fff
+    style AUDIT fill:#ff6b35,stroke:#fff,color:#fff
+    style GIT fill:#ff6b35,stroke:#fff,color:#fff
+    style JSONL fill:#ffd700,stroke:#1a1a2e,color:#1a1a2e
+    style GITLOG fill:#ffd700,stroke:#1a1a2e,color:#1a1a2e
+    style GITDIFF fill:#ffd700,stroke:#1a1a2e,color:#1a1a2e

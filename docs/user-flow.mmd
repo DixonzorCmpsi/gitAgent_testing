@@ -1,0 +1,65 @@
+%%{init: {'theme': 'dark', 'themeVariables': {'fontSize': '14px'}}}%%
+flowchart TD
+    Start([User launches forge-chat.py]) --> Input[/User describes a task\n'Build me an agent that reviews PRs'/]
+
+    Input --> Parse[Agent Forge parses the request\nExtracts: purpose, domain,\ncapabilities, risk level]
+
+    Parse --> Search{Search for\nexisting agents}
+
+    Search --> |gh search repos| GitHub[(GitHub API)]
+    GitHub --> Results{Matching\nagents found?}
+
+    Results --> |Yes| Evaluate[Evaluate fitness\n- Skills match?\n- Actively maintained?\n- Extensible?]
+    Evaluate --> Recommend{Strong match?}
+
+    Recommend --> |Yes - exact match| Reuse[Recommend reusing\nexisting agent]
+    Reuse --> ShowReuse[/Display agent details:\nname, skills, URL, how to run/]
+    ShowReuse --> Done
+
+    Recommend --> |Partial match| Fork[Recommend forking\nand extending]
+    Fork --> Confirm1{User approves?}
+    Confirm1 --> |Yes| ForkRepo[Fork repo + add new skills]
+    Confirm1 --> |No| Scaffold
+
+    Recommend --> |No match| Scaffold
+
+    Results --> |No| Scaffold[Scaffold new gitagent]
+
+    Scaffold --> Design[Design agent architecture\n- agent.yaml manifest\n- SOUL.md identity\n- RULES.md boundaries\n- Skills and tools]
+
+    Design --> Preview[/Show user the proposed:\nagent.yaml + SOUL.md\nskills list + tool list/]
+
+    Preview --> Confirm2{User approves\nthe design?}
+    Confirm2 --> |No - feedback| Revise[Revise based on\nuser feedback]
+    Revise --> Design
+
+    Confirm2 --> |Yes| Create[Create GitHub repository\ngh repo create]
+    Create --> Push[Add all gitagent files\nCommit + push to GitHub]
+    Push --> Validate[Run gitagent validate\nConfirm spec compliance]
+
+    Validate --> |Pass| Report[/Report to user:\n- Agent name + version\n- GitHub repo URL\n- Skills and tools list\n- Export commands/]
+    Validate --> |Fail| Fix[Fix validation errors]
+    Fix --> Validate
+
+    Report --> Done([User has a deployable agent])
+
+    Done --> Export{User wants to\nexport?}
+    Export --> |Claude Code| CC[gitagent export -f claude-code]
+    Export --> |OpenClaw| OC[gitagent export -f openclaw]
+    Export --> |OpenAI| OA[gitagent export -f openai]
+    Export --> |CrewAI| CR[gitagent export -f crewai]
+    Export --> |System prompt| SP[gitagent export -f system-prompt]
+
+    style Start fill:#1a1a2e,stroke:#00d4aa,color:#fff
+    style Done fill:#1a1a2e,stroke:#00d4aa,color:#fff
+    style Input fill:#16213e,stroke:#0f3460,color:#fff
+    style Preview fill:#16213e,stroke:#0f3460,color:#fff
+    style ShowReuse fill:#16213e,stroke:#0f3460,color:#fff
+    style Report fill:#16213e,stroke:#0f3460,color:#fff
+    style Search fill:#0f3460,stroke:#e94560,color:#fff
+    style Results fill:#0f3460,stroke:#e94560,color:#fff
+    style Recommend fill:#0f3460,stroke:#e94560,color:#fff
+    style Confirm1 fill:#0f3460,stroke:#e94560,color:#fff
+    style Confirm2 fill:#0f3460,stroke:#e94560,color:#fff
+    style Export fill:#0f3460,stroke:#e94560,color:#fff
+    style GitHub fill:#533483,stroke:#e94560,color:#fff

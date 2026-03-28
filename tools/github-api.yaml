@@ -1,0 +1,13 @@
+name: github-api
+description: Interact with GitHub via the gh CLI — create repos, search, manage files, PRs, and issues
+input_schema:
+  type: object
+  properties:
+    command:
+      type: string
+      description: The gh CLI command to execute (e.g., "repo create", "search repos", "api repos/{owner}/{repo}")
+    args:
+      type: string
+      description: Arguments and flags for the command
+  required:
+    - command
