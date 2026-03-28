@@ -21,6 +21,11 @@ tools:
   - github-api
   - gitagent-cli
   - search-youtube
+  - web-search
+  - web-fetch
+  - read-file
+  - write-file
+  - exec
 
 runtime:
   max_turns: 30
